@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Courses</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .btn {
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-left: 10px;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-home {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .info-box {
+            background: #e7f3ff;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Student Courses</h1>
+            <a th:href="@{/students}" class="btn btn-home">← Back to Students</a>
+        </div>
+        
+        <div class="info-box">
+            <p><strong>Student:</strong> <span th:text="${student.name}"></span></p>
+            <p><strong>Roll:</strong> <span th:text="${student.roll}"></span></p>
+            <p><strong>Department:</strong> <span th:text="${student.departmentName}"></span></p>
+        </div>
+        
+        <div class="section">
+            <h2>Enrolled Courses</h2>
+            <table th:if="${!student.courseNames.isEmpty()}">
+                <thead>
+                    <tr>
+                        <th>Course Name</th>
+                        <th sec:authorize="hasRole('TEACHER')">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="courseName, iterStat : ${student.courseNames}">
+                        <td th:text="${courseName}"></td>
+                        <td sec:authorize="hasRole('TEACHER')">
+                            <a th:href="@{/students/{studentId}/remove/{courseId}(studentId=${student.id}, courseId=${student.courseIds[iterStat.index]})}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Remove this course?')">Remove</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <p th:if="${student.courseNames.isEmpty()}">No courses enrolled yet.</p>
+        </div>
+        
+        <div class="section" sec:authorize="hasRole('TEACHER')">
+            <h2>Enroll in New Course</h2>
+            <form th:action="@{/students/{studentId}/enroll/{courseId}(studentId=${student.id}, courseId=0)}" method="post">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Department</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="course : ${allCourses}">
+                            <td th:text="${course.code}"></td>
+                            <td th:text="${course.name}"></td>
+                            <td th:text="${course.credits}"></td>
+                            <td th:text="${course.departmentName}"></td>
+                            <td>
+                                <form th:action="@{/students/{studentId}/enroll/{courseId}(studentId=${student.id}, courseId=${course.id})}" 
+                                      method="post" style="display: inline;">
+                                    <button type="submit" class="btn btn-primary">Enroll</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

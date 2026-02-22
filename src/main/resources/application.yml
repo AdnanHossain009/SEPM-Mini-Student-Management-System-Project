@@ -1,0 +1,41 @@
+#spring:
+#
+#  application:
+#    name: WebApp
+#
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#
+#    url: jdbc:postgresql://localhost:5432/admindb
+#    username: admin
+#    password: admin
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update
+#
+#  docker:
+#    compose:
+#      enabled: false
+
+
+spring:
+
+  application:
+    name: WebApp
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: ${PORT:8080}
